@@ -14,9 +14,24 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'HomeController@index')->name('index');
+
+// Rutas para Usuarios
+Route::group(['middleware' => 'auth'], function() {
+        // Rutas para borrado y restauracion
+        Route::get('/users/trash','UserController@trashed')
+        ->name('users.trashed')
+        ->middleware('auth');
+        Route::get('/users/{user}/restore','UserController@restore')
+        ->name('users.restore');
+        Route::patch('/users/{user}/trash','UserController@trash')
+        ->name('users.trash')
+        ->middleware('permission:users.destroy');
+        // Rutas para CRUD
+        Route::Resource('users', 'UserController');
+});
